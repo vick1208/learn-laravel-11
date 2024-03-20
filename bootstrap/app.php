@@ -1,9 +1,11 @@
 <?php
 
+use App\Exceptions\ValidationError;
 use App\Http\Middleware\LogMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,5 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(LogMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->dontReport(ValidationError::class);
+
+        $exceptions->renderable(fn(ValidationError $exception,Request $request) => response(["Bad Request",$request,$exception],400));
     })->create();
